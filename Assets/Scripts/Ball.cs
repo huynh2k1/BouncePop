@@ -11,13 +11,13 @@ public class Ball : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Wall"))
-        {
-            if(_rb2D.gravityScale <= 2f)
-            {
-                _rb2D.gravityScale += 1f;
-            }
-        }
+        //if(collision.gameObject.CompareTag("Wall"))
+        //{
+        //    if(_rb2D.gravityScale <= 1f)
+        //    {
+        //        _rb2D.gravityScale += 0.2f;
+        //    }
+        //}
         if(collision.gameObject.CompareTag("bound"))
         {
             _rb2D.gravityScale = 0f;

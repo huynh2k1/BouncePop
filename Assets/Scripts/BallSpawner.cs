@@ -1,44 +1,66 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class BallSpawner : MonoBehaviour
 {
     public static BallSpawner Instance;
-    public Transform firePoint;
-    public float angleLimit = 75f;
-    public Vector3 dir;
+    private RaycastHit2D ray;
+    [SerializeField] private LayerMask layermask; //layer để check raycast
 
-    public Ball ballPrefab;
-    public float force;
+    private float angle; // góc bắn
+    //public int ballSum; //Số lượng bóng tối đa ở mỗi màn chơi
+    //public int currentBall; //Số lượng bóng hiện tại
+    //public Ball ballPrefab; //gameObject quả bóng
+    //public float forceShoot; //Lực bắn
+    [SerializeField] Vector2 minMaxAngle;
+    public Dots dotLine;
+
     private void Awake()
     {
-        if (Instance == null)
+        if(Instance == null)
+        {
             Instance = this;
+        }
+    }
+    public void FixedUpdate()
+    {
+        //ray = Physics2D.Raycast(transform.position, transform.up, 20f, layermask);
+        //Debug.DrawRay(transform.position, ray.point, Color.red); 
     }
     private void Update()
     {
-        if (Input.GetMouseButton(0) )
+        if(Input.GetMouseButton(0))
         {
-
-            Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
-            dir = Input.mousePosition - pos;
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 90f;
-            Debug.Log("góc: " + angle);
-            if(angle <= angleLimit && angle >= -angleLimit)
-            {
-                transform.rotation = Quaternion.AngleAxis(angle, transform.forward);
-            }
-        }
-        if(Input.GetMouseButtonUp(0))
-        {
-            ShootBall();
+            DrawLine();
         }
     }
 
-    private void ShootBall()
+    private void DrawLine()
     {
-        Ball ball = Instantiate(ballPrefab, firePoint.position, Quaternion.identity);
-        ball.GetComponent<Rigidbody2D>().AddForce(dir.normalized * force);
+        ray = Physics2D.Raycast(transform.position, -transform.up, 20f, layermask);
+        //Debug.DrawRay(transform.position, ray.point, Color.red);
+
+        Vector2 reflactPos = Vector2.Reflect(new Vector3(ray.point.x, ray.point.y) - transform.position, ray.normal);
+        Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
+        Vector3 dir = Input.mousePosition - pos;
+
+        angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
+
+        
+        dotLine.DrawDottedLine(transform.position, ray.point);
+        dotLine.DrawDottedLine(ray.point, ray.point + reflactPos.normalized * 3f);
+       
+        //transform.rotation = Quaternion.AngleAxis(angle, transform.forward);
+        DotLineRotate();
+    }
+    private void DotLineRotate()
+    {
+        Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
+        Vector3 dir = Input.mousePosition - pos;
+        angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 90f;
+        transform.rotation = Quaternion.AngleAxis(angle, transform.forward);
     }
 }
