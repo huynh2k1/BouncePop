@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Wall
   - bound
+  - Top
+  - Cell
+  - Ball
   layers:
   - Default
   - TransparentFX
